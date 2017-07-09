@@ -16,20 +16,34 @@ class Task(db.Model):
     name = db.Column(db.String(120))
     def __init__(self, name):
         self.name = name
-        
-tasks = []
 
 
 
 @app.route('/', methods=['POST', 'GET'])
 def index():
 
+# Adding tasks to list
     if request.method == 'POST':
-        task = request.form['task']
-        tasks.append(task)
+        task_name = request.form['task']
+        new_task = Task(task_name)
+        db.session.add(new_task)
+        db.session.commit()
 
+# Show all tasks
+    tasks = Task.query.all()
     return render_template('todos.html',title="Get It Done!", tasks=tasks)
 
+@app.route('/delete-task', methods=['POST'])
+def delete_task():
 
+# Removing tasks from list (marking them as 'Done!')
+    task_id = int(request.form['task-id'])
+    task = Task.query.get(task_id)
+    db.session.delete(task)
+    db.session.commit()
+    
+    return redirect('/')
+
+# only run app if it is called, otherwise ignore
 if __name__ == '__main__':
     app.run()
