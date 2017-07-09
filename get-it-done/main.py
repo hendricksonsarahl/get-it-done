@@ -3,23 +3,23 @@ from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
 app.config['DEBUG'] = True
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://get-it-done:launchcode@localhost:8889/get-it-done'
 app.config['SQLALCHEMY_ECHO'] = True
 
 # Note: the connection string after :// contains the following info:
 # user:password@server:portNumber/databaseName
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://get-it-done:beproductive@localhost:8889/get-it-done'
-
 db = SQLAlchemy(app)
-
-tasks = []
 
 class Task(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(120))
-
     def __init__(self, name):
         self.name = name
+        
+tasks = []
+
+
 
 @app.route('/', methods=['POST', 'GET'])
 def index():
