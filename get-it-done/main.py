@@ -1,4 +1,4 @@
-from flask import Flask, request, redirect, render_template
+from flask import Flask, request, redirect, render_template, session
 from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
@@ -33,13 +33,51 @@ class User(db.Model):
 
 
 
-@app.route('/login')
+@app.route('/login', methods=['POST', 'GET'])
 def login():
+    if request.method == 'POST':
+        email = request.form['email']
+        password = request.form['password']
+        user = User.query.filter_by(email=email).first()
+        session['email'] = email
+        if user and user.password == password:
+            # TODO remember that user is logged in
+            return redirect('/')
+        else:
+            # Error message for failed login
+            return '<h1>Error! Email and/or password is not found</h1>'
+
+
     return render_template('login.html')
 
-@app.route('/register')
+@app.route('/register', methods=['POST', 'GET'])
 def register():
+    if request.method == 'POST':
+        email = request.form['email']
+        password = request.form['password']
+        verify = request.form['verify']
+        session['email'] = email
+
+        # TODO Validate user data
+
+        existing_user = User.query.filter_by(email=email).first()
+        if not existing_user:
+            new_user = User(email, password)
+            db.session.add(new_user)
+            db.session.commit()
+            # TODO remember the user, "logged in" state
+            return redirect('/')
+        else:
+            # TODO better response messaging
+            return "<h1>Error: User with this email already exists, please login or create an account with a different email address</h1>"
+
+
     return render_template('register.html')
+
+@app.route('logout' methods=['GET'])
+def logout():
+    del session['email']
+    return redirect('/login')
 
 @app.route('/', methods=['POST', 'GET'])
 def index():
