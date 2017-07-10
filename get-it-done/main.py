@@ -1,4 +1,4 @@
-from flask import Flask, request, redirect, render_template, session
+from flask import Flask, request, redirect, render_template, session, flash
 from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
@@ -42,11 +42,11 @@ def login():
         user = User.query.filter_by(email=email).first()
         session['email'] = email
         if user and user.password == password:
-            # TODO remember that user is logged in
+            flash("Login successful", category='message')
             return redirect('/')
         else:
             # Error message for failed login
-            return '<h1>Error! Email and/or password is not found</h1>'
+            flash("Error: Email/Password combination not found, please check entries and try again", category='error')
 
 
     return render_template('login.html')
@@ -66,14 +66,11 @@ def register():
             new_user = User(email, password)
             db.session.add(new_user)
             db.session.commit()
-            # TODO remember the user, "logged in" state
+            flash("Registration successful", category='message')
             return redirect('/')
         else:
-            # TODO better response messaging
-            return "<h1>Error: User with this email already exists, please login or create an account with a different email address</h1>"
-
-
-    return render_template('register.html')
+            flash("Login successful", category='message')
+            return render_template('register.html')
 
 @app.before_request
 def require_login():
@@ -84,6 +81,7 @@ def require_login():
 @app.route('/logout')
 def logout():
     del session['email']
+    flash("Logout successful", category='message')
     return redirect('/')
 
 @app.route('/', methods=['POST', 'GET'])
