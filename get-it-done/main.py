@@ -12,10 +12,14 @@ app.config['SQLALCHEMY_ECHO'] = True
 db = SQLAlchemy(app)
 
 class Task(db.Model):
+
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(120))
+    completed = db.Column(db.Boolean)
+
     def __init__(self, name):
         self.name = name
+        self.completed = False
 
 
 
@@ -30,8 +34,9 @@ def index():
         db.session.commit()
 
 # Show all tasks
-    tasks = Task.query.all()
-    return render_template('todos.html',title="Get It Done!", tasks=tasks)
+    tasks = Task.query.filter_by(completed=False).all()
+    completed_tasks = Task.query.filter_by(completed=True).all()
+    return render_template('todos.html',title="Get It Done!", tasks=tasks, completed_tasks=completed_tasks)
 
 @app.route('/delete-task', methods=['POST'])
 def delete_task():
@@ -39,7 +44,8 @@ def delete_task():
 # Removing tasks from list (marking them as 'Done!')
     task_id = int(request.form['task-id'])
     task = Task.query.get(task_id)
-    db.session.delete(task)
+    task.completed = True
+    db.session.add(task)
     db.session.commit()
     
     return redirect('/')

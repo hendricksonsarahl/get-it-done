@@ -26,6 +26,20 @@
             </li>
             {% endfor %}
         </ul>
-
     {% endif %}
+
+    <hr />
+
+    {% if completed_tasks|length == 0 %}
+    <p>Nothing done yet, get to work!</p>
+        {% else %}
+
+        <h2>Donezo!</h2>
+            <ul>
+                {% for task in completed_tasks %}
+                <li>{{task.name}}</li>
+        {% endfor %}
+            </ul>
+    {% endif %}
+
 {% endblock %}
