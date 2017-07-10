@@ -5,6 +5,7 @@ app = Flask(__name__)
 app.config['DEBUG'] = True
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://get-it-done:launchcode@localhost:8889/get-it-done'
 app.config['SQLALCHEMY_ECHO'] = True
+app.secret_key = 'itisasecret'
 
 # Note: the connection string after :// contains the following info:
 # user:password@server:portNumber/databaseName
@@ -74,10 +75,16 @@ def register():
 
     return render_template('register.html')
 
-@app.route('logout' methods=['GET'])
+@app.before_request
+def require_login():
+    allowed_routes = ['login', 'register']
+    if request.endpoint not in allowed_routes and 'email' not in session:
+        return redirect('/login')
+
+@app.route('/logout')
 def logout():
     del session['email']
-    return redirect('/login')
+    return redirect('/')
 
 @app.route('/', methods=['POST', 'GET'])
 def index():
@@ -105,6 +112,7 @@ def delete_task():
     db.session.commit()
     
     return redirect('/')
+
 
 # only run app if it is called, otherwise ignore
 if __name__ == '__main__':
