@@ -5,7 +5,7 @@ app = Flask(__name__)
 app.config['DEBUG'] = True
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://get-it-done:launchcode@localhost:8889/get-it-done'
 app.config['SQLALCHEMY_ECHO'] = True
-app.secret_key = 'itisasecret'
+app.secret_key = 'U\xee\xe2F\xd2\x03\xa8\x9d+\xe3\xfb5gz\xea'
 
 # Note: the connection string after :// contains the following info:
 # user:password@server:portNumber/databaseName
